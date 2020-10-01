@@ -25,7 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "clientmap.h"
 #include "scripting_client.h"
 #include "mapblock_mesh.h"
-#include "event.h"
+#include "mtevent.h"
 #include "collision.h"
 #include "nodedef.h"
 #include "profiler.h"
@@ -216,6 +216,9 @@ void ClientEnvironment::step(float dtime)
 		*/
 
 		{
+			// Control local player
+			lplayer->applyControl(dtime_part, this);
+
 			// Apply physics
 			if (!free_move && !is_climbing) {
 				// Gravity

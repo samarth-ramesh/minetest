@@ -38,6 +38,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "serverenvironment.h"
 #include "clientiface.h"
 #include "chatmessage.h"
+#include "translation.h"
 #include <string>
 #include <list>
 #include <map>
@@ -131,7 +132,8 @@ public:
 		bool simple_singleplayer_mode,
 		Address bind_addr,
 		bool dedicated,
-		ChatInterface *iface = nullptr
+		ChatInterface *iface = nullptr,
+		std::string *on_shutdown_errmsg = nullptr
 	);
 	~Server();
 	DISABLE_CLASS_COPY(Server);
@@ -342,8 +344,8 @@ public:
 	// Send block to specific player only
 	bool SendBlock(session_t peer_id, const v3s16 &blockpos);
 
-	// Load translations for a language
-	void loadTranslationLanguage(const std::string &lang_code);
+	// Get or load translations for a language
+	Translations *getTranslationLanguage(const std::string &lang_code);
 
 	// Bind address
 	Address m_bind_addr;
@@ -556,6 +558,8 @@ private:
 	// Mods
 	std::unique_ptr<ServerModManager> m_modmgr;
 
+	std::unordered_map<std::string, Translations> server_translations;
+
 	/*
 		Threads
 	*/
@@ -595,6 +599,10 @@ private:
 
 	ChatInterface *m_admin_chat;
 	std::string m_admin_nick;
+
+	// if a mod-error occurs in the on_shutdown callback, the error message will
+	// be written into this
+	std::string *const m_on_shutdown_errmsg;
 
 	/*
 		Map edit event queue. Automatically receives all map edits.
